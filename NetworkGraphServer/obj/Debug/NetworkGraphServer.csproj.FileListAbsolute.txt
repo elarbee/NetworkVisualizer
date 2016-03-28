@@ -1,0 +1,13 @@
+c:\users\alex\documents\visual studio 2015\Projects\NetworkGraphServer\NetworkGraphServer\bin\Debug\NetworkGraphServer.exe.config
+c:\users\alex\documents\visual studio 2015\Projects\NetworkGraphServer\NetworkGraphServer\bin\Debug\NetworkGraphServer.exe
+c:\users\alex\documents\visual studio 2015\Projects\NetworkGraphServer\NetworkGraphServer\bin\Debug\NetworkGraphServer.pdb
+c:\users\alex\documents\visual studio 2015\Projects\NetworkGraphServer\NetworkGraphServer\obj\Debug\NetworkGraphServer.csprojResolveAssemblyReference.cache
+c:\users\alex\documents\visual studio 2015\Projects\NetworkGraphServer\NetworkGraphServer\obj\Debug\NetworkGraphServer.exe
+c:\users\alex\documents\visual studio 2015\Projects\NetworkGraphServer\NetworkGraphServer\obj\Debug\NetworkGraphServer.pdb
+c:\users\alex\documents\visual studio 2015\Projects\NetworkGraphServer\NetworkGraphServer\bin\Debug\SharpPcap.dll
+c:\users\alex\documents\visual studio 2015\Projects\NetworkGraphServer\NetworkGraphServer\bin\Debug\PacketDotNet.dll
+c:\users\alex\documents\visual studio 2015\Projects\NetworkGraphServer\NetworkGraphServer\bin\Debug\SharpPcap.xml
+c:\users\alex\documents\visual studio 2015\Projects\NetworkGraphServer\NetworkGraphServer\bin\Debug\PacketDotNet.xml
+c:\users\alex\documents\visual studio 2015\Projects\NetworkGraphServer\NetworkGraphServer\bin\Debug\Newtonsoft.Json.dll
+c:\users\alex\documents\visual studio 2015\Projects\NetworkGraphServer\NetworkGraphServer\bin\Debug\Newtonsoft.Json.pdb
+c:\users\alex\documents\visual studio 2015\Projects\NetworkGraphServer\NetworkGraphServer\bin\Debug\Newtonsoft.Json.xml
