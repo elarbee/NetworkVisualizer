@@ -16,9 +16,13 @@ namespace NetworkGraphServer
         public static Node[] myNodes = new Node[0];
         public static Edge[] myEdges = new Edge[0];
         public static Graph myGraph = new Graph(myNodes, myEdges);
-        public static string JSONFileAddress = @"C:\Users\Alex\Documents\Visual Studio 2015\Projects\NetworkGraphServer\HTMLClient\graphData.json";
+        public static string JSONFileAddress = @"C:\Users\Alex\Documents\Visual Studio 2015\Projects\NetworkGraphServer\HTMLClient\data\graphData.json";
 
         static Random r = new Random();
+
+        //Used for checking if a ethernet frame is a broadcast
+        static Byte[] BROADCAST_BYTES = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+        static String BROADCAST_STRING = BitConverter.ToString(BROADCAST_BYTES); 
 
         public static void Main(string[] args)
         {
@@ -102,11 +106,15 @@ namespace NetworkGraphServer
             //Booleans used to check if the node already exists
             bool dNodeExists = false;
             bool sNodeExists = false;
+            bool edgeExists = false;
 
             String destinationlabel = "MAC Address: " + DestinationMac;
             String sourcelabel = "MAC Address: " + SourceMac;
+
             Node dNode = new Node(DestinationMac, destinationlabel, r.Next(0, 10), r.Next(0, 10), 3);
             Node sNode = new Node(SourceMac, sourcelabel, r.Next(0, 10), r.Next(0, 10), 3);
+
+            // NODES!!
 
             //Iterate through current nodes and make sure we arent adding a duplicate
             foreach (Node n in myGraph.nodes)
@@ -146,6 +154,35 @@ namespace NetworkGraphServer
                 newNodeArray[newNodeArray.Length-1] = sNode;
 
                 myGraph.nodes = newNodeArray;
+            }
+
+            // EDGES!!
+
+            Edge newEdge = new Edge(SourceMac + "_" + DestinationMac, SourceMac, DestinationMac);
+
+            //Iterate through current edges and make sure we arent adding a duplicate
+            foreach (Edge e in myGraph.edges)
+            {
+                if (e.id == newEdge.id)
+                {
+                    edgeExists = true;
+                }
+
+            }
+
+            //If the ethernet frame is not a broadcast, add an Edge to the graph between the destination and source ports.
+            if (!DestinationMac.Equals(BROADCAST_STRING) && !DestinationMac.Equals(BROADCAST_STRING) && !edgeExists)
+            {
+                
+
+                //Create new array with an extra space for our new edge.
+                Edge[] newEdgeArray = new Edge[myGraph.edges.Length + 1];
+                //Copy old array into new array
+                myGraph.edges.CopyTo(newEdgeArray, 0);
+                //Append new edge to end
+                newEdgeArray[newEdgeArray.Length - 1] = newEdge;
+
+                myGraph.edges = newEdgeArray;
             }
         }
 
