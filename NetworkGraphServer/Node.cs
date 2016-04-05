@@ -10,11 +10,11 @@ namespace NetworkGraphServer
     {
         public string id;
         public string label;
-        public int x;
-        public int y;
+        public double x;
+        public double y;
         public int size;
 
-        public Node(string ID,string Label,int X,int Y, int Size)
+        public Node(string ID,string Label,double X,double Y, int Size)
         {
             id = ID;
             label = Label;
