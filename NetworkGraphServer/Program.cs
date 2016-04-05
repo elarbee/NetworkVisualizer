@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,7 +16,7 @@ namespace NetworkGraphServer
         public static Node[] myNodes = new Node[0];
         public static Edge[] myEdges = new Edge[0];
         public static Graph myGraph = new Graph(myNodes, myEdges);
-        public static string JSONFileAddress = @"C:\Users\Alex\Documents\Visual Studio 2015\Projects\NetworkGraphServer\HTMLClient\data\graphData.json";
+        public static string JSONFileAddress = @"graphData.json";
 
         static Random r = new Random();
 
@@ -88,8 +88,7 @@ namespace NetworkGraphServer
             //Copy Source MAC data
             Array.Copy(packetData, 6, sourceMAC, 0, 6);
 
-            Console.WriteLine("Packet Start");
-            Console.WriteLine();
+            Console.WriteLine("Packet Recieved " + time.Second +"." + time.Millisecond);
 
             updateGraph(BitConverter.ToString(destinationMAC), BitConverter.ToString(sourceMAC));
 
@@ -111,8 +110,8 @@ namespace NetworkGraphServer
             String destinationlabel = "MAC Address: " + DestinationMac;
             String sourcelabel = "MAC Address: " + SourceMac;
 
-            Node dNode = new Node(DestinationMac, destinationlabel, r.Next(0, 10), r.Next(0, 10), 3);
-            Node sNode = new Node(SourceMac, sourcelabel, r.Next(0, 10), r.Next(0, 10), 3);
+            Node dNode = new Node(DestinationMac, destinationlabel, r.NextDouble() * 10.0, r.NextDouble() * 10.0, 3);
+            Node sNode = new Node(SourceMac, sourcelabel, r.NextDouble() * 10.0, r.NextDouble() * 10.0, 3);
 
             // NODES!!
 
