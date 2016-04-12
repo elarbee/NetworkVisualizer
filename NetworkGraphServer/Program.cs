@@ -16,13 +16,16 @@ namespace NetworkGraphServer
         public static Node[] myNodes = new Node[0];
         public static Edge[] myEdges = new Edge[0];
         public static Graph myGraph = new Graph(myNodes, myEdges);
-        public static string JSONFileAddress = @"C:\Users\Alex\Documents\Visual Studio 2015\Projects\NetworkGraphServer\HTMLClient\data\graphData.json";
+        public static string JSONFileAddress = @"HTMLClient/graphData.json";
 
         static Random r = new Random();
 
         //Used for checking if a ethernet frame is a broadcast
         static Byte[] BROADCAST_BYTES = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-        static String BROADCAST_STRING = BitConverter.ToString(BROADCAST_BYTES); 
+        static String BROADCAST_STRING = BitConverter.ToString(BROADCAST_BYTES);
+
+        //Used for decoding the EtherType Field on packets
+        private static EtherTypeDecoder EtherDecoder = new EtherTypeDecoder();
 
         public static void Main(string[] args)
         {
@@ -41,7 +44,7 @@ namespace NetworkGraphServer
             }
 
             // Extract a device from the list
-            ICaptureDevice device = devices[0];
+            ICaptureDevice device = devices[1];
 
             // Register our handler function to the
             // 'packet arrival' event
@@ -82,26 +85,33 @@ namespace NetworkGraphServer
             Byte[] destinationMAC = new byte[6];
             //Ethernet MAC Source
             Byte[] sourceMAC = new byte[6];
+            //EtherType Byte Array
+            Byte[] EtherType = new byte[2];
 
             //Copy Destination MAC data
             Array.Copy(packetData, 0, destinationMAC, 0, 6);
             //Copy Source MAC data
             Array.Copy(packetData, 6, sourceMAC, 0, 6);
+            //Copy EtherType
+            Array.Copy(packetData, 12, EtherType, 0, 2);
 
-            Console.WriteLine("Packet Start");
-            Console.WriteLine();
+            String EtherTypeString = EtherDecoder.decode(EtherType);
+            Console.WriteLine("Packet Recieved, Type = " + EtherTypeString);
+            //Update Graph
+            updateGraph(BitConverter.ToString(destinationMAC), BitConverter.ToString(sourceMAC), EtherTypeString);
 
-            updateGraph(BitConverter.ToString(destinationMAC), BitConverter.ToString(sourceMAC));
-
+            //Create Graph Object
             Graph g = myGraph;
 
+            //Convert Graph C# Object into JSON
             string JSON = JsonConvert.SerializeObject(g);
 
+            //Write JSON to file
             System.IO.File.WriteAllText(JSONFileAddress, JSON);
 
         }
 
-        private static void updateGraph(String DestinationMac, String SourceMac)
+        private static void updateGraph(String DestinationMac, String SourceMac, String EtherType)
         {
             //Booleans used to check if the node already exists
             bool dNodeExists = false;
@@ -158,7 +168,7 @@ namespace NetworkGraphServer
 
             // EDGES!!
 
-            Edge newEdge = new Edge(SourceMac + "_" + DestinationMac, SourceMac, DestinationMac);
+            Edge newEdge = new Edge(SourceMac + "_" + DestinationMac,EtherType, SourceMac, DestinationMac);
 
             //Iterate through current edges and make sure we arent adding a duplicate
             foreach (Edge e in myGraph.edges)
