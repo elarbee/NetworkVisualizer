@@ -131,8 +131,6 @@ namespace NetworkGraphServer
             String destinationlabel = "MAC Address: " + DestinationMac + Environment.NewLine + dBroadcastType;
             String sourcelabel = "MAC Address: " + SourceMac + Environment.NewLine + sBroadcastType;
 
-            Console.WriteLine(generateLabel(DestinationMac));
-
             Frame f = new Frame(DestinationMac, SourceMac, EtherType, rawData.Replace("-", " "));
             Node dNode = new Node(DestinationMac, destinationlabel, r.NextDouble() * 10.0, r.NextDouble() * 10.0, 3, f);
             Node sNode = new Node(SourceMac, sourcelabel, r.NextDouble() * 10.0, r.NextDouble() * 10.0, 3, f);
@@ -207,19 +205,6 @@ namespace NetworkGraphServer
 
                 myGraph.edges = newEdgeArray;
             }
-        }
-
-        //Check if 
-        private static string generateLabel(string macAddress)
-        {
-            //SAhould this be from hex or ascii?
-            byte firstByte = Convert.ToByte(macAddress[0]);
-            var bits = new BitArray(new Byte[] { firstByte });
-
-            var unicast = bits.Get(0);
-            Console.WriteLine(macAddress + Environment.NewLine + " " + bits.ToString());
-            return macAddress + Environment.NewLine + bits.ToString();
-
         }
 
         //determine broadcast type
