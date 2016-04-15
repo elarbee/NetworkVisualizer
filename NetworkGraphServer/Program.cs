@@ -23,7 +23,7 @@ namespace NetworkGraphServer
         static Random r = new Random();
 
         //Used for checking if a ethernet frame is a broadcast
-        static Byte[] BROADCAST_BYTES = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+        static Byte[] BROADCAST_BYTES = new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
         static String BROADCAST_STRING = BitConverter.ToString(BROADCAST_BYTES);
 
         //Used for decoding the EtherType Field on packets
@@ -45,8 +45,16 @@ namespace NetworkGraphServer
                 return;
             }
 
+            Console.WriteLine("Please select a capture device");
+
+            for(int i = 0; i < devices.Count; i++)
+            {
+                Console.WriteLine(i+": "+devices[i].Description);
+            }
+
+            int devNumber = Convert.ToInt32(Console.ReadLine());
             // Extract a device from the list
-            ICaptureDevice device = devices[1];
+            ICaptureDevice device = devices[devNumber];
 
             // Register our handler function to the
             // 'packet arrival' event
@@ -100,7 +108,7 @@ namespace NetworkGraphServer
             String EtherTypeString = EtherDecoder.decode(EtherType);
             Console.WriteLine("Packet Recieved, Type = " + EtherTypeString);
             //Update Graph
-            updateGraph(BitConverter.ToString(destinationMAC), BitConverter.ToString(sourceMAC), EtherTypeString,BitConverter.ToString(packetData));
+            updateGraph(BitConverter.ToString(destinationMAC), BitConverter.ToString(sourceMAC), EtherTypeString, getDestinationBroadcastType(packetData), getSourceBroadcastType(packetData), BitConverter.ToString(packetData));
 
             //Create Graph Object
             Graph g = myGraph;
@@ -113,33 +121,33 @@ namespace NetworkGraphServer
 
         }
 
-        private static void updateGraph(String DestinationMac, String SourceMac, String EtherType, string rawData)
+        private static void updateGraph(String DestinationMac, String SourceMac, String EtherType, string dBroadcastType,string sBroadcastType, string rawData)
         {
             //Booleans used to check if the node already exists
             bool dNodeExists = false;
             bool sNodeExists = false;
             bool edgeExists = false;
 
-            String destinationlabel = "MAC Address: " + DestinationMac;
-            String sourcelabel = "MAC Address: " + SourceMac;
+            String destinationlabel = "MAC Address: " + DestinationMac + Environment.NewLine + dBroadcastType;
+            String sourcelabel = "MAC Address: " + SourceMac + Environment.NewLine + sBroadcastType;
 
             Console.WriteLine(generateLabel(DestinationMac));
 
-            Frame f = new Frame(DestinationMac, SourceMac, EtherType, rawData.Replace("-"," "));
-            Node dNode = new Node(DestinationMac, destinationlabel, r.NextDouble() * 10.0, r.NextDouble() * 10.0, 3,f);
-            Node sNode = new Node(SourceMac, sourcelabel, r.NextDouble() * 10.0, r.NextDouble() * 10.0, 3,f);
+            Frame f = new Frame(DestinationMac, SourceMac, EtherType, rawData.Replace("-", " "));
+            Node dNode = new Node(DestinationMac, destinationlabel, r.NextDouble() * 10.0, r.NextDouble() * 10.0, 3, f);
+            Node sNode = new Node(SourceMac, sourcelabel, r.NextDouble() * 10.0, r.NextDouble() * 10.0, 3, f);
 
             // NODES!!
 
             //Iterate through current nodes and make sure we arent adding a duplicate
             foreach (Node n in myGraph.nodes)
             {
-                if(n.id == dNode.id)
+                if (n.id == dNode.id)
                 {
                     dNodeExists = true;
                 }
 
-                if(n.id == sNode.id)
+                if (n.id == sNode.id)
                 {
                     sNodeExists = true;
                 }
@@ -153,7 +161,7 @@ namespace NetworkGraphServer
                 //Copy old array into new array
                 myGraph.nodes.CopyTo(newNodeArray, 0);
                 //Append new node to end
-                newNodeArray[newNodeArray.Length-1] = dNode;
+                newNodeArray[newNodeArray.Length - 1] = dNode;
 
                 myGraph.nodes = newNodeArray;
             }
@@ -166,14 +174,14 @@ namespace NetworkGraphServer
                 //Copy old array into new array
                 myGraph.nodes.CopyTo(newNodeArray, 0);
                 //Append new node to end
-                newNodeArray[newNodeArray.Length-1] = sNode;
+                newNodeArray[newNodeArray.Length - 1] = sNode;
 
                 myGraph.nodes = newNodeArray;
             }
 
             // EDGES!!
 
-            Edge newEdge = new Edge(SourceMac + "_" + DestinationMac,EtherType, SourceMac, DestinationMac);
+            Edge newEdge = new Edge(SourceMac + "_" + DestinationMac, EtherType, SourceMac, DestinationMac);
 
             //Iterate through current edges and make sure we arent adding a duplicate
             foreach (Edge e in myGraph.edges)
@@ -188,7 +196,7 @@ namespace NetworkGraphServer
             //If the ethernet frame is not a broadcast, add an Edge to the graph between the destination and source ports.
             if (!DestinationMac.Equals(BROADCAST_STRING) && !DestinationMac.Equals(BROADCAST_STRING) && !edgeExists)
             {
-                
+
 
                 //Create new array with an extra space for our new edge.
                 Edge[] newEdgeArray = new Edge[myGraph.edges.Length + 1];
@@ -209,10 +217,57 @@ namespace NetworkGraphServer
             var bits = new BitArray(new Byte[] { firstByte });
 
             var unicast = bits.Get(0);
-            Console.WriteLine(macAddress + Environment.NewLine +" "+ bits.ToString());
+            Console.WriteLine(macAddress + Environment.NewLine + " " + bits.ToString());
             return macAddress + Environment.NewLine + bits.ToString();
-            
+
         }
-    }
+
+        //determine broadcast type
+        public static string getDestinationBroadcastType(byte[] b)
+        {
+            byte[] destinationMAC = new byte[6];
+            Array.Copy(b, 0, destinationMAC, 0, 6);
+
+            if (BitConverter.ToString(destinationMAC) == BROADCAST_STRING)
+            {
+                return "BROADCAST";
+            }
+
+            BitArray bits = new BitArray(new byte[] { destinationMAC[0] });
+            if (bits[bits.Length - 1])
+            {
+                return "MULTICAST";
+            }
+
+            else
+            {
+                return "UNICAST";
+            }
+        }
+
+        public static string getSourceBroadcastType(byte[] b)
+        {
+            //Ethernet MAC Source
+            Byte[] sourceMAC = new byte[6];
+            //Copy Source MAC data
+            Array.Copy(b, 6, sourceMAC, 0, 6);
+
+            if (BitConverter.ToString(sourceMAC) == BROADCAST_STRING)
+            {
+                return "BROADCAST";
+            }
+
+            BitArray bits = new BitArray(new byte[] { sourceMAC[0] });
+            if (bits[bits.Length - 1])
+            {
+                return "MULTICAST";
+            }
+
+            else
+            {
+                return "UNICAST";
+            }
+        }
 
     }
+}
