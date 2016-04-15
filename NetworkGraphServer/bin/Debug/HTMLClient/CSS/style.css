@@ -1,0 +1,73 @@
+body, html{
+  height:100%;
+    margin:0px;
+}
+#graph-container {
+width:100%;
+height:70%;
+}
+img{
+margin-top:25px;
+margin-left: 5px;
+height:125px;
+}
+#header{
+  height:150px;
+}
+
+#footer{
+    display: none;
+    height:350px;
+    resize: vertical;
+}
+
+/* Wireshark CSS */
+
+.blue{
+    background-color: deepskyblue;
+}
+
+.frame-fields{
+    display: none;
+}
+
+li{
+    border-bottom: 1px solid;
+    border-bottom-color: darkgray;
+}
+
+.blue > *{
+    background-color: white;
+}
+
+.highlight{
+    background-color: aqua;
+}
+
+#packet-data{
+    height: 60%;
+    white-space: pre;
+    overflow-y: scroll;
+    resize: vertical;
+}
+
+#infoFooter{
+    height:1em;
+    position: fixed;
+    bottom: 0px;
+    width: 100%;
+    background: lightgrey;
+}
+
+#hideFooter{
+    background-color: white;
+    border: 1px solid;
+    border-radius: 10px;
+    height: 2em;
+    position:relative;
+    bottom: 10px;
+}
+
+.ethernet-list{
+    width:40%
+}

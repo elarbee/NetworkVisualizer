@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections;
 using Newtonsoft.Json;
 using SharpPcap;
 
@@ -17,7 +18,7 @@ namespace NetworkGraphServer
         public static Edge[] myEdges = new Edge[0];
         public static Graph myGraph = new Graph(myNodes, myEdges);
 
-        public static string JSONFileAddress = @"HTMLClient/graphData.json";
+        public static string JSONFileAddress = @"HTMLClient/data/graphData.json";
 
         static Random r = new Random();
 
@@ -99,7 +100,7 @@ namespace NetworkGraphServer
             String EtherTypeString = EtherDecoder.decode(EtherType);
             Console.WriteLine("Packet Recieved, Type = " + EtherTypeString);
             //Update Graph
-            updateGraph(BitConverter.ToString(destinationMAC), BitConverter.ToString(sourceMAC), EtherTypeString);
+            updateGraph(BitConverter.ToString(destinationMAC), BitConverter.ToString(sourceMAC), EtherTypeString,BitConverter.ToString(packetData));
 
             //Create Graph Object
             Graph g = myGraph;
@@ -112,7 +113,7 @@ namespace NetworkGraphServer
 
         }
 
-        private static void updateGraph(String DestinationMac, String SourceMac, String EtherType)
+        private static void updateGraph(String DestinationMac, String SourceMac, String EtherType, string rawData)
         {
             //Booleans used to check if the node already exists
             bool dNodeExists = false;
@@ -122,8 +123,11 @@ namespace NetworkGraphServer
             String destinationlabel = "MAC Address: " + DestinationMac;
             String sourcelabel = "MAC Address: " + SourceMac;
 
-            Node dNode = new Node(DestinationMac, destinationlabel, r.NextDouble() * 10.0, r.NextDouble() * 10.0, 3);
-            Node sNode = new Node(SourceMac, sourcelabel, r.NextDouble() * 10.0, r.NextDouble() * 10.0, 3);
+            Console.WriteLine(generateLabel(DestinationMac));
+
+            Frame f = new Frame(DestinationMac, SourceMac, EtherType, rawData.Replace("-"," "));
+            Node dNode = new Node(DestinationMac, destinationlabel, r.NextDouble() * 10.0, r.NextDouble() * 10.0, 3,f);
+            Node sNode = new Node(SourceMac, sourcelabel, r.NextDouble() * 10.0, r.NextDouble() * 10.0, 3,f);
 
             // NODES!!
 
@@ -197,6 +201,18 @@ namespace NetworkGraphServer
             }
         }
 
+        //Check if 
+        private static string generateLabel(string macAddress)
+        {
+            //SAhould this be from hex or ascii?
+            byte firstByte = Convert.ToByte(macAddress[0]);
+            var bits = new BitArray(new Byte[] { firstByte });
+
+            var unicast = bits.Get(0);
+            Console.WriteLine(macAddress + Environment.NewLine +" "+ bits.ToString());
+            return macAddress + Environment.NewLine + bits.ToString();
+            
+        }
     }
 
     }

@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html>
+<head>
 <!-- START SIGMA IMPORTS -->
 <script src="js/sigma.core.js"></script>
 <script src="js/conrad.js"></script>
@@ -53,31 +56,55 @@
 
 <!-- END SIGMA IMPORTS -->
 <script src="js/sigma.parsers.json.js"></script>
-<div id="container">
-  <style>
-      body{
-          margin:0px;
-      }
-    #graph-container {
-      width:100%;
-	  height:100%;
-    }
-	img{
-        margin-top:25px;
-        margin-left: 5px;
-		height:125px;
-	}
-      #header{
-          height:150px;
-      }
-  </style>
+ <!-- Custom CSS -->
+<link href="css/style.css" rel="stylesheet">
+
+<script src="js/jquery-1.11.3.min.js"></script>
+    
+<script src="js/list-controller.js"></script>
+</head>
+
   <div id="header">
 	<img src="img/logo.png">
+      <button id="hideFooter">Toggle Footer</button>
   </div>
   <hr>
   <div id="graph-container"></div>
-</div>
+  <div id="footer">
+    <hr>
+    <div id="list-container">
+    <ul class="ethernet-list">
+        <li class="frame">
+        Ethernet Frame
+            <ul class="frame-fields">
+                <li class="destination">Destination: 00:00:5e:00:01:01</li>
+                <li class="source">Source: 00:25:64:d5:10:8b</li>
+                <li class="ethertype">Type: IPv4</li>
+            </ul>
+        </li>  
+    </ul>    
+    </div>
+      <hr>
+    <div id="packet-data">
+        <code>
+<span id="destinationSpan">00 00 5e 00 01 01</span> <span id="sourceSpan">00 25 64 d5 10 8b</span> <span id="ethertypeSpan">08 00</span><span id="rawDataSpan">00 34 5b 3d 40 00 80 06 00 00 80 d0 02 97 4a 7d  
+7f 68 dd f0 00 50 49 db 4d ff 00 00 00 00 80 02  
+fa f0 4d 73 00 00 02 04 05 b4 01 03 03 00 01 01  
+04 02</span>
+            </code>
+    </div>
+    <div id="infoFooter">
+        <code id="info"></code>
+    </div>
+  </div>
+    
 <script>
+//Get JSON and turn it into a javascript object
+    var g;
+    $.getJSON('data/graphData.json',function(data){
+        g = data;
+    });
+
 /**
  * Here is just a basic example on how to properly display a graph
  * exported from Gephi as a JSON file, with the JSON Exporter plugin from
@@ -93,8 +120,9 @@
  * before the instanciation.
  */
 
-sigma.parsers.json('data/graphData.json', {
-	container: 'graph-container',
+//Create Sigma Object
+s = new sigma({
+  container: 'graph-container',
     renderer: {                                                        
         container: "graph-container",                                        
         type: "canvas"                                                 
@@ -104,8 +132,16 @@ sigma.parsers.json('data/graphData.json', {
     defaultEdgeType: 'arrow',
     minArrowSize: 8
     }
-  
-}); 
+});
+    
+//Load JSON into Sigma object    
+sigma.parsers.json('data/graphData.json',s, function(){s.refresh()});
 
-//setInterval(function(){ s.refresh(); }, 300);
+    
+//Node click handler
+s.bind('clickNode', function(e) {
+    fillFooter(e.data.node.id,g);
+});
+
 </script>
+</html>

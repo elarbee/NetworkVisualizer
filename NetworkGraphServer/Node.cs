@@ -13,14 +13,15 @@ namespace NetworkGraphServer
         public double x;
         public double y;
         public int size;
-
-        public Node(string ID,string Label,double X,double Y, int Size)
+        public Frame frameData;
+        public Node(string ID,string Label,double X,double Y, int Size, Frame FrameData)
         {
             id = ID;
             label = Label;
             x = X;
             y = Y;
             size = Size;
+            frameData = FrameData;
         }
     }
 }

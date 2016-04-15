@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Edge.cs" />
     <Compile Include="EtherTypeDecoder.cs" />
+    <Compile Include="Frame.cs" />
     <Compile Include="Graph.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="Program.cs" />
